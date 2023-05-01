@@ -3,31 +3,30 @@
 
 class Solution {
     public int findJudge(int n, int[][] trust) {
-        // Initialize an array to keep track of the number of trusts each person has
-        int[] trustCounts = new int[n + 1];
-        
-        // Iterate over the trust relationships and update the trust counts
-        for (int[] relationship : trust) {
-            int trustor = relationship[0];
-            int trustee = relationship[1];
-            trustCounts[trustor]--;
-            trustCounts[trustee]++;
+        int[] trustCount = new int[n + 1]; // Array to store the number of people trusted by each person
+        boolean[] trustsSomeone = new boolean[n + 1]; // Array to store whether each person trusts someone
+
+        // Loop through each trust relationship and update trustCount and trustsSomeone accordingly
+        for (int i = 0; i < trust.length; i++) {
+            int truster = trust[i][0];
+            int trustee = trust[i][1];
+
+            trustCount[trustee]++; // Increment the number of people trusted by the trustee
+            trustsSomeone[truster] = true; // Mark the truster as someone who trusts someone else
         }
-        
-        // Iterate over the trust counts and find the person with n-1 trusts
+
+        int judge = -1; // Initialize the town judge to -1
         for (int i = 1; i <= n; i++) {
-            if (trustCounts[i] == n - 1) {
-                // Check that the person doesn't trust anyone else
-                for (int j = 1; j <= n; j++) {
-                    if (i != j && trustCounts[j] >= 0) {
-                        return -1;
-                    }
+            // If a person trusts no one and is trusted by everyone else, they are the town judge
+            if (trustCount[i] == n - 1 && !trustsSomeone[i]) {
+                if (judge == -1) {
+                    judge = i; // Set the town judge to the current person
+                } else {
+                    return -1; // There cannot be more than one town judge, so return -1
                 }
-                return i;
             }
         }
-        
-        // If there is no such person, return -1
-        return -1;
+
+        return judge; // Return the town judge
     }
 }
